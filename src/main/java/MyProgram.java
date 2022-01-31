@@ -5,7 +5,7 @@ public class MyProgram {
      ApiClient myApiClient;
 
     public MyProgram() {
-        myApiClient = new ApiClient("http://127.0.0.1:8080/api/v1");
+        myApiClient = new ApiClient("http://127.0.0.1:8080/api/v1/blog");
     }
 
 
@@ -40,19 +40,25 @@ public class MyProgram {
 
                     break;
                 case 3:
+                    listBlogPost();
 
                     break;
                 case 4:
+                    updateBlogPost();
 
                     break;
 
                 case 5:
+                    deleteBlogPost();
 
                     break;
                 case 6:
                     clearBlogPosts();
                     break;
                 case 7:
+                    System.out.println("Du har valt att avsluta programmet");
+                    programRun = false;
+                    break;
 
 
             }
@@ -70,7 +76,7 @@ public class MyProgram {
                 String title = blogPosts[i].title;
                 int id = blogPosts[i].id;
 
-                System.out.printf("-> %s (%d/10)\n", title, id);
+                System.out.println("Titel: " + title + ", ID: " + id);
             }
         } else {
             System.out.println("Det finns inga blogginlägg :(");
@@ -105,6 +111,64 @@ public class MyProgram {
         else {
             System.out.println("Det gick inte att ta bort alla blogginlägg");
         }
+    }
+
+    //Metod ta bort specifikt inlägg
+    public void deleteBlogPost() {
+        System.out.println("Skriv id:et på det blogginlägg som du vill ta bort:");
+        int blogid = getUserInt();
+
+        if (myApiClient.deleteBlogPost(blogid)) {
+            System.out.println("Du har tagit bort blogginlägg: " + blogid);
+        }
+        else {
+            System.out.println("Det gick inte att ta bort något blogginlägg :(");
+        }
+    }
+
+    //Metod lista specifikt inlägg
+    public void listBlogPost() {
+        System.out.println("Skriv id:et på det blogginlägg du vill se: ");
+        int blogid = getUserInt();
+        Blog blog = myApiClient.GetBlogPost(blogid);
+
+        if (blog != null) {
+            String title = blog.title;
+            String body = blog.body;
+            int id = blog.id;
+
+            System.out.println("ID: " + id);
+            System.out.println("Titel: " + title);
+            System.out.println("Innehåll: " + body);
+        }
+            else {
+            System.out.println("Det finns inget blogginlägg med detta id");
+
+            }
+    }
+
+    //Metod uppdatera specifikt inlägg
+    public void updateBlogPost() {
+        System.out.println("Skriv id:et på inlägget som du vill uppdatera:");
+        int id = getUserInt();
+
+        System.out.println("Skriv din nya titel: ");
+        String updateTitle = getUserString();
+
+        System.out.println("Skriv innehållet i ditt nya inlägg: ");
+        String updateBody = getUserString();
+
+        Blog updateBlog = new Blog(updateTitle, updateBody);
+
+        boolean success = myApiClient.updateBlogPost(id, updateBlog);
+
+        if (success) {
+            System.out.println("Du har uppdaterat ditt blogginlägg!");
+        }
+        else {
+            System.out.println("Det gick inte att uppdatera ditt blogginlägg");
+        }
+
     }
 
     public String getUserString() {

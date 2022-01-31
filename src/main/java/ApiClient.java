@@ -37,11 +37,11 @@ public class ApiClient {
         return myArrayOfStrings;
     }
 
-    // Vår metod för att hämta filmer
+    //Metod för att hämta alla blogginlägg
     public Blog[] getBlogPosts() {
         Blog[] blogPosts = {};
 
-        String target = "/blog/list";
+        String target = "/list";
 
         //System.out.println("Getting movies from " + apiAddress + target);
 
@@ -89,8 +89,9 @@ public class ApiClient {
         return blogPosts;
     }
 
+    //Metod för att rensa alla blogginlägg
     public boolean clearBlogPosts() {
-        String target = "/blog/clear"; // http://127.0.0.1:8080/api/v1/blog/clear
+        String target = "/clear"; // http://127.0.0.1:8080/api/v1/blog/clear
 
         //System.out.println("Clearing movies from " + apiAddress + target);
 
@@ -119,8 +120,9 @@ public class ApiClient {
         return success;
     }
 
+    //Metod för att skapa ett nytt blogginlägg
     public boolean addBlogPost(Blog newPost) {
-        String target = "/blog/create";
+        String target = "/create";
 
         //System.out.println("Adding movie at " + apiAddress + target);
 
@@ -169,4 +171,123 @@ public class ApiClient {
 
         return success;
     }
-}
+
+    //Metod för att ta bort ett specifikt inlägg
+    public boolean deleteBlogPost(int id) {
+        String target = "/delete/" + id;
+
+        boolean success = false;
+
+        try {
+            URL url = new URL(apiAddress + target);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("DELETE");
+
+            int status = connection.getResponseCode();
+
+            System.out.println(status);
+            if (status < 300) {
+                success = true;
+            }
+
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+        } finally {
+            connection.disconnect();
+        }
+
+        return success;
+
+        }
+
+    //Metod för lista specifikt inlägg
+    public Blog GetBlogPost(int id) {
+        Blog blog = new Blog ();
+        String target = "/get/" + id;
+
+        BufferedReader reader;
+        String line;
+        StringBuilder responseContent = new StringBuilder();
+
+        try {
+            URL url = new URL(apiAddress + target);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("accept", "application/json");
+
+            int status = connection.getResponseCode();
+
+            if (status >= 300) {
+                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                while ((line = reader.readLine()) != null) {
+                    responseContent.append(line);
+                }
+                reader.close();
+            } else {
+                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                while ((line = reader.readLine()) != null) {
+                    responseContent.append(line);
+                }
+                reader.close();
+            }
+
+            String jsonStr = responseContent.toString();
+
+
+            ObjectMapper mapper = new ObjectMapper();
+            blog = mapper.readValue(jsonStr, Blog.class);
+
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+        } finally {
+            connection.disconnect();
+        }
+
+        return blog;
+
+
+
+    }
+
+    //Metod för att uppdatera specifikt inlägg
+    public boolean updateBlogPost (int id, Blog update) {
+        String target = "/update/" + id;
+
+        boolean success = false;
+
+        try {
+
+            URL url = new URL(apiAddress + target);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json; utf-8");
+            connection.setDoOutput(true);
+
+
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = update.toJson().getBytes(StandardCharsets.UTF_8);
+
+                os.write(input, 0, input.length);
+            }
+
+            int status = connection.getResponseCode();
+
+            if (status < 300) {
+                success = true;
+            }
+
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+        } finally {
+            connection.disconnect();
+        }
+
+        return success;
+
+
+
+    }
+
+
+    }
+
