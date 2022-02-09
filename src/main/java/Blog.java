@@ -34,8 +34,6 @@ public class Blog implements Jsonable {
 
         @Override
         public Object getValue() {
-            /* Can represent a valid default, error value, or null adhoc for the JsonKey. See the javadocs for more
-             * information about its intended use. */
             return this.value;
         }
     }
@@ -53,12 +51,6 @@ public class Blog implements Jsonable {
         this.title = title;
         this.body = body;
     }
-  /*
-  private Movie() {
-    this.title = (String)se.jensen.caw21.bjorn.Movie.keys.TITLE.getValue();
-    this.rating = (int)se.jensen.caw21.bjorn.Movie.keys.RATING.getValue();
-  }
-  */
 
     public String getTitle() {
         return this.title;
@@ -78,7 +70,7 @@ public class Blog implements Jsonable {
         try {
             this.toJson(writable);
         } catch (final Exception e) {
-            /* See java.io.StringWriter. */
+
         }
         return writable.toString();
     }

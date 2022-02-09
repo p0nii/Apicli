@@ -1,4 +1,5 @@
 // Dessa paket använder vi för att läsa information från och skriva information till HTTP-anslutningar
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -29,13 +30,6 @@ public class ApiClient {
         this.apiAddress = apiAddress;
     }
 
-    public ArrayList<String> getStringArray(String target) {
-        JsonObject countryObj = new JsonObject();
-
-        ArrayList<String> myArrayOfStrings = new ArrayList<>();
-
-        return myArrayOfStrings;
-    }
 
     //Metod för att hämta alla blogginlägg
     public Blog[] getBlogPosts() {
@@ -43,14 +37,11 @@ public class ApiClient {
 
         String target = "/list";
 
-        //System.out.println("Getting movies from " + apiAddress + target);
-
-        // Se kommentarer i metoden addMovie()
         BufferedReader reader;
         String line;
         StringBuilder responseContent = new StringBuilder();
 
-        // Se kommentarer i metoden addMovie()
+
         try {
             URL url = new URL(apiAddress + target);
             connection = (HttpURLConnection) url.openConnection();
@@ -73,10 +64,9 @@ public class ApiClient {
                 reader.close();
             }
 
-            //System.out.println(responseContent.toString());
             String jsonStr = responseContent.toString();
 
-            // Se kommentarer i metoden addMovie()
+
             ObjectMapper mapper = new ObjectMapper();
             blogPosts = mapper.readValue(jsonStr, Blog[].class);
 
@@ -89,42 +79,9 @@ public class ApiClient {
         return blogPosts;
     }
 
-    //Metod för att rensa alla blogginlägg
-    public boolean clearBlogPosts() {
-        String target = "/clear"; // http://127.0.0.1:8080/api/v1/blog/clear
-
-        //System.out.println("Clearing movies from " + apiAddress + target);
-
-        boolean success = false;
-
-        try {
-            URL url = new URL(apiAddress + target);
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("DELETE");
-
-            int status = connection.getResponseCode();
-
-            System.out.println("Http status " + status);
-
-            if (status < 300) {
-                success = true;
-            }
-
-            //System.out.println(responseContent.toString());
-        } catch (Exception e) {
-            System.out.println("Exception: " + e);
-        } finally {
-            connection.disconnect();
-        }
-
-        return success;
-    }
-
     //Metod för att skapa ett nytt blogginlägg
     public boolean addBlogPost(Blog newPost) {
         String target = "/create";
-
-        //System.out.println("Adding movie at " + apiAddress + target);
 
         boolean success = false;
 
@@ -142,7 +99,7 @@ public class ApiClient {
             connection.setRequestProperty("Content-Type", "application/json; utf-8");
             connection.setDoOutput(true);
 
-            // Konvertera vårt Java-objekt (Movie) till JSON med hjälp av .toJSON-metoden i klassen Movie,
+            // Konvertera vårt Java-objekt (Blog) till JSON med hjälp av .toJSON-metoden i klassen Blog,
             // och skriv den JSON-datan till vår nätverksanslutning med hjälp av en OutputStream
             try (OutputStream os = connection.getOutputStream()) {
                 // Skapa en byte-array som innehåller JSON-datan
@@ -162,7 +119,6 @@ public class ApiClient {
                 success = true;
             }
 
-            //System.out.println(responseContent.toString());
         } catch (Exception e) {
             System.out.println("Exception: " + e);
         } finally {
@@ -198,12 +154,12 @@ public class ApiClient {
 
         return success;
 
-        }
+    }
 
     //Metod för lista specifikt inlägg
     public Blog GetBlogPost(int id) {
-        Blog blog = new Blog ();
-        String target = "/get/" + id;
+        Blog blog = null;
+        String target = "/view/" + id;
 
         BufferedReader reader;
         String line;
@@ -216,29 +172,34 @@ public class ApiClient {
             connection.setRequestProperty("accept", "application/json");
 
             int status = connection.getResponseCode();
-
+            System.out.println("httpstatus: " + status);
             if (status >= 300) {
-                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-                while ((line = reader.readLine()) != null) {
-                    responseContent.append(line);
+                if (connection.getErrorStream() != null) {
+                    reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                    while ((line = reader.readLine()) != null) {
+                        responseContent.append(line);
+                    }
+                    reader.close();
                 }
-                reader.close();
             } else {
-                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                while ((line = reader.readLine()) != null) {
-                    responseContent.append(line);
+                if (connection.getInputStream() != null) {
+                    reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    while ((line = reader.readLine()) != null) {
+                        responseContent.append(line);
+                    }
+                    reader.close();
                 }
-                reader.close();
             }
+            if (status == 200) {
+                String jsonStr = responseContent.toString();
 
-            String jsonStr = responseContent.toString();
 
-
-            ObjectMapper mapper = new ObjectMapper();
-            blog = mapper.readValue(jsonStr, Blog.class);
-
+                ObjectMapper mapper = new ObjectMapper();
+                blog = mapper.readValue(jsonStr, Blog.class);
+            }
         } catch (Exception e) {
             System.out.println("Exception: " + e);
+            e.printStackTrace();
         } finally {
             connection.disconnect();
         }
@@ -246,11 +207,10 @@ public class ApiClient {
         return blog;
 
 
-
     }
 
     //Metod för att uppdatera specifikt inlägg
-    public boolean updateBlogPost (int id, Blog update) {
+    public boolean updateBlogPost(int id, Blog update) {
         String target = "/update/" + id;
 
         boolean success = false;
@@ -271,7 +231,7 @@ public class ApiClient {
             }
 
             int status = connection.getResponseCode();
-
+            System.out.println("httpstatus: " + status);
             if (status < 300) {
                 success = true;
             }
@@ -285,9 +245,8 @@ public class ApiClient {
         return success;
 
 
-
     }
 
 
-    }
+}
 

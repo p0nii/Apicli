@@ -2,12 +2,12 @@ import java.util.Scanner;
 
 public class MyProgram {
 
-     ApiClient myApiClient;
+    ApiClient myApiClient;
 
+    //Konstruktor som skapar ett nytt ApiClient-objekt
     public MyProgram() {
         myApiClient = new ApiClient("http://127.0.0.1:8080/api/v1/blog");
     }
-
 
 
     //Där vårt program startar
@@ -23,8 +23,7 @@ public class MyProgram {
             System.out.println("3. Visa ett specifikt inlägg");
             System.out.println("4. Uppdatera ett specifikt inlägg");
             System.out.println("5. Ta bort ett specifikt inlägg");
-            System.out.println("6. Ta bort alla inlägg");
-            System.out.println("7. Avsluta program");
+            System.out.println("6. Avsluta program");
 
             int userChoice = getUserInt();
 
@@ -53,9 +52,6 @@ public class MyProgram {
 
                     break;
                 case 6:
-                    clearBlogPosts();
-                    break;
-                case 7:
                     System.out.println("Du har valt att avsluta programmet");
                     programRun = false;
                     break;
@@ -65,11 +61,11 @@ public class MyProgram {
         }
     }
 
-    //Metod lista alla blogginlägg
+    //Metod för att lista alla blogginlägg
     public void listBlogPosts() {
         Blog[] blogPosts = myApiClient.getBlogPosts();
 
-        System.out.println("Blogginlägg");
+        System.out.println("Blogginlägg:");
 
         if (blogPosts.length > 0) {
             for (int i = 0; i < blogPosts.length; i++) {
@@ -83,7 +79,7 @@ public class MyProgram {
         }
     }
 
-    //Metod skapa ett blogginlägg
+    //Metod för att skapa ett blogginlägg
     public void addBlogPost() {
         System.out.println("Title?");
         String title = getUserString();
@@ -91,42 +87,30 @@ public class MyProgram {
         System.out.println("Skriv ditt inlägg: ");
         String body = getUserString();
 
-        Blog newBlog = new Blog (title, body);
+        Blog newBlog = new Blog(title, body);
 
         boolean success = myApiClient.addBlogPost(newBlog);
 
         if (success) {
             System.out.println("Ett blogginlägg har skapats");
-        }
-        else {
+        } else {
             System.out.println("Det gick inte att skapa ett blogginlägg :(");
         }
     }
 
-    //Metod ta bort alla blogginlägg
-    public void clearBlogPosts() {
-        if (myApiClient.clearBlogPosts()) {
-            System.out.println("Alla blogginlägg har tagits bort");
-        }
-        else {
-            System.out.println("Det gick inte att ta bort alla blogginlägg");
-        }
-    }
-
-    //Metod ta bort specifikt inlägg
+    //Metod för att ta bort specifikt inlägg
     public void deleteBlogPost() {
         System.out.println("Skriv id:et på det blogginlägg som du vill ta bort:");
         int blogid = getUserInt();
 
         if (myApiClient.deleteBlogPost(blogid)) {
             System.out.println("Du har tagit bort blogginlägg: " + blogid);
-        }
-        else {
+        } else {
             System.out.println("Det gick inte att ta bort något blogginlägg :(");
         }
     }
 
-    //Metod lista specifikt inlägg
+    //Metod för att lista specifikt inlägg
     public void listBlogPost() {
         System.out.println("Skriv id:et på det blogginlägg du vill se: ");
         int blogid = getUserInt();
@@ -140,14 +124,13 @@ public class MyProgram {
             System.out.println("ID: " + id);
             System.out.println("Titel: " + title);
             System.out.println("Innehåll: " + body);
-        }
-            else {
+        } else {
             System.out.println("Det finns inget blogginlägg med detta id");
 
-            }
+        }
     }
 
-    //Metod uppdatera specifikt inlägg
+    //Metod för att uppdatera specifikt inlägg
     public void updateBlogPost() {
         System.out.println("Skriv id:et på inlägget som du vill uppdatera:");
         int id = getUserInt();
@@ -164,8 +147,7 @@ public class MyProgram {
 
         if (success) {
             System.out.println("Du har uppdaterat ditt blogginlägg!");
-        }
-        else {
+        } else {
             System.out.println("Det gick inte att uppdatera ditt blogginlägg");
         }
 
